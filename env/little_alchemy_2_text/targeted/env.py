@@ -217,6 +217,12 @@ class LittleAlchemy2TextTargeted(WordCraftEnv):
                     self.past_valid_combs[tuple(actions)] = self.table.index(result)
             return obs, reward, self.done, info
 
+    def summarise(self):
+
+        if self.done:
+            return " having discovered the target in " + str(self.episode_step) + " rounds"
+        else:
+            return " not having discover the target."
     def encode(self, word):
         length = 5
         random.seed(word)
@@ -282,8 +288,47 @@ class LittleAlchemy2TextTargeted(WordCraftEnv):
         output += "\nTask invalid combinations (do not repeat combinations here): " + ", ".join(past_invalid_combs_str)
         return output
 
-    def render(self, mode='human'):
-        return self._display_llm()
+
+    def _display_social(self, envs):
+        social_info = "Other players valid combinations: "
+        total_valid_combs = ""
+
+        for env in envs:
+            valid_combs = ""
+
+            counter = 0
+            for key, val in env.past_valid_combs.items():
+                subkeys = []
+                for subkey in key:
+                    subkeys.append(str(env.index_to_word(subkey)))
+                new_key = '"' + subkeys[0] + '" and "' + subkeys[1]
+                val = str(env.index_to_word(val))
+                if env.encoded:
+                    valid_combs += new_key + " -> " + self.encode(val) + " , "
+                else:
+                    valid_combs += new_key + " -> " + val + " , "
+
+                counter = counter + 1
+                if counter > 15:
+                    break
+            total_valid_combs += valid_combs
+
+            past_invalid_combs = env.past_invalid_combs
+            past_invalid_combs = past_invalid_combs[-15:]
+            past_invalid_combs_str = []
+            for el in past_invalid_combs:
+                past_invalid_combs_str.append(
+                    '"' + str(env.index_to_word(el[0])) + '" and "' + str(env.index_to_word(el[1])) + '"')
+
+        social_info += valid_combs + "\nOther players invalid combinations (do not repeat combinations here): " +  ", ".join(past_invalid_combs_str)
+
+        return social_info
+
+    def render(self,  envs, mode='human'):
+        info = self._display_llm()
+
+        social_info = self._display_social(envs)
+        return  info + "\n" + social_info
 
     def invalid_combs_to_string(self, past_invalid_combs):
         past_invalid_combs_str = ""

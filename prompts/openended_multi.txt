@@ -1,0 +1,128 @@
+<human> You are a helpful assistant that plays a game called Little Alchemy 2.
+I will give you instructions on how to play the game and examples of tasks.
+Then, I will give you new tasks that you must play as best as you can.
+The game is a textworld where you can combine items in pairs to create new items.
+At the first round I will give you a set of items. For example: 'human', 'metal', 'fire', 'life', 'wall'.
+You can combine two items to make new ones.
+For example if you combine 'life' and 'metal' you get 'robot' because a piece of 'metal' that has 'life' is a robot.
+You can also combine an item with itself.
+For example you can combine 'wall' with 'wall' to make 'house'.
+But not all combinations will give you a new item.
+The game finds inspiration in the real world to determine which combinations are valid and which are not.
+For example 'fire' and 'life' is an invalid combination, so it will not give you a new item.
+The order of the two items does not matter: 'fire' and 'life' is the same combination with 'life' and 'fire'.
+The goal of the game is to discover all the possible items.
+So you need to keep combining the items you have available to find new ones.
+You should not attempt the same combination twice in a task.
+
+Other players will be playing the game at the same time with you. You will all be given the same task but independently: you will each
+choose your own actions and create your own items. But I will give you some information about what the other players are doing that you can use to solve
+your task better.
+
+For each task you will play multiple rounds and, at each round, I will give you the following information in the INPUT:
+
+Inventory: this is a list of the available items that you can combine in pairs to make new items
+Task valid combinations (do not repeat combinations here): a list of the combinations you tried in previous rounds of this task that gave you a new item. ou should not repeat combinations in this list
+Task invalid combinations (do not repeat combinations here): a list of the combinations you made in previous rounds of this task that did not give you a new item. ou should not repeat combinations in this list
+Other players valid: a list of the combinations that the other player tried in previous rounds of this task that gave them a new item
+Other players invalid (do not repeat combinations here): a list of the combinations that the other player tried in previous rounds of this task that did not give them a new item. You should not repeat combinations in this list
+Other players valid combinations:
+Other players invalid combinations (do not repeat combinations here):
+
+Your response should contain only the following information:
+
+Combination: the two items you want to combine. Both items should be in your inventory
+Reasoning: based on the information in the INPUT, do reasoning about why you chose this combination
+
+Here is a simple example:
+
+<human> INPUT:
+Inventory: 'science', 'ocean', 'dinosaur'
+Task valid combinations (do not repeat combinations here):
+Task invalid combinations (do not repeat combinations here):
+Other players valid combinations:
+Other players invalid combinations (do not repeat combinations here):
+
+<bot> RESPONSE:
+Combination: 'science' and 'dinosaur'
+Reasoning: a scientist that studies dinosaurs is a paleontologist, which is a new item
+
+<human> Here is an example that shows how that you can sometimes combine an element with itself:
+
+Inventory: 'wall', 'earth', 'mud', 'angel'
+Task valid combinations (do not repeat combinations here):
+Task invalid combinations (do not repeat combinations here):
+Other players valid combinations:
+Other players invalid combinations (do not repeat combinations here):
+
+<bot> RESPONSE:
+Combination: 'wall' and 'wall'
+Reasoning: I can combine an element with itself so I will create a house by combining two walls
+
+<human> Here is an example that shows how you can use the information provided in "Task valid combinations":
+
+<human> INPUT:
+Inventory: 'human', 'metal', 'fire', 'life', 'robot'
+Task valid combinations (do not repeat combinations here): 'metal' and 'life -> 'robot'
+Task invalid combinations (do not repeat combinations here):
+Other players valid combinations:
+Other players invalid combinations (do not repeat combinations here):
+
+<bot> RESPONSE:
+Combination: 'robot' and 'human'
+Reasoning: When I started this task 'robot' was not in my inventory. But I combined 'metal' and 'life' which gave the item 'robot'. This means that I cannot combine "metal" and "life" again. Now I can combine 'robot' and 'human' to make a 'cyborg' because a cyborg is a human with robotic parts.
+
+<human> Here is an example that shows how you can use the information provided in "Task invalid combinations":
+
+<human> INPUT:
+Inventory: 'human', 'metal', 'fire', 'life'
+Task valid combinations (do not repeat combinations here):
+Task invalid combinations (do not repeat combinations here): 'fire' and 'life'
+Other players valid combinations:
+Other players invalid combinations (do not repeat combinations here):
+
+<bot> RESPONSE:
+Combination: 'metal' and 'life'
+Reasoning: In a previous round of this task I tried to combine 'fire' and 'life' and didn't get a new item. So I should not try this combo again.  I can combine 'metal' and 'life' to make a 'robot' because a robot is made of metal and behaves like a living organism.
+
+
+<human> Here is an example that shows you how to use the information in the error message:
+
+<human> INPUT:
+Inventory: 'human', 'metal', 'fire', 'life', 'robot'
+Task valid combinations (do not repeat combinations here): 'metal' and 'life -> 'robot'
+Task invalid combinations (do not repeat combinations here):
+Other players valid combinations:
+Other players invalid combinations (do not repeat combinations here):
+You have already combined 'metal' and 'life', so you cannot repeat it. Try another one.
+
+<bot> RESPONSE:
+Combination: 'robot' and 'human'
+Reasoning: I see in the Error message that I should not try combining 'metal' and 'life' because I have done it already. So I will make another combination.
+
+<human> Here is an example that shows you how you can use information about the other player:
+
+<human> INPUT:
+Inventory: 'human', 'metal', 'fire', 'life'
+Task valid combinations:
+Task invalid combinations (do not repeat combinations here): 'fire' and 'life'
+Other players valid combinations: 'metal' and 'life' -> 'robot'
+Other players invalid combinations (do not repeat combinations here): 'human' and "fire"
+
+<bot> RESPONSE:
+Combination: 'metal' and 'life'
+Reasoning: The other player combined 'metal' and 'life' to make 'robot'. 'Robot' looks like a useful item to have to make 'cyborg' so I will create it now and use it in the next round. I also see that the other player tried the invalid combination "human" and "fire", so I will never try it myself
+
+
+<human> Here are some clarifications:
+- To reason about which combinations to try, think about science! Combinations are inspired from the real world
+- Your combination can only contain items that are in the inventory
+- If a item is in your inventory, you do not need to create it again
+- If you see a combination in 'Task valid combinations', you should not retry it as you already have the item.
+- If you see a combination in 'Task invalid combinations', you should not retry it as you already have the item.
+- Air, fire, earth and water will lead you to countless discoveries.
+- Try mixing items with a copy of themselves — wall + wall will surely result in a house.
+- Some items like human or plant will lead to more discoveries than others.
+- The order of the two items you use in the combination does not matter. This means that if you have tried "water" and "earth", you should not try "earth" and "water".
+
+Let's play a new task

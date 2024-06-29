@@ -8,64 +8,101 @@ import env.little_alchemy_2_text.openended.env
 import env.little_alchemy_2_text.targeted.env
 
 import gym
+from players.human import Human
+from players.LLM import LLM
+
+
+def setup(args):
+    nhuman = int(input('How many human players are there?'))
+    nLLM = int(input('How many LLM players are there?'))
+
+
+    group = []
+    for i in range(nhuman):
+        if args.targeted:
+            task_descript = "Combine the available items to make the target item"
+            env = gym.make("LittleAlchemy2TextTargeted-v0",
+                           seed=args.seed,
+                           max_mix_steps=args.rounds,
+                           num_distractors=args.distractors,
+                           max_depth=args.depth,
+                           encoded=args.encoded)
+        else:
+            task_descript = "Combine the available items to make as many items as possible."
+            env = gym.make("LittleAlchemy2TextOpen-v0",
+                           seed=args.seed,
+                           max_mix_steps=args.rounds,
+                           encoded=args.encoded)
+        group.append(Human(i, env, task_descript))
+
+    for i in range(nhuman, nhuman+nLLM):
+        if args.targeted:
+            env = gym.make("LittleAlchemy2TextTargeted-v0",
+                           seed=args.seed,
+                           max_mix_steps=args.rounds,
+                           num_distractors=args.distractors,
+                           max_depth=args.depth,
+                           encoded=args.encoded)
+        else:
+            env = gym.make("LittleAlchemy2TextOpen-v0",
+                           seed=args.seed,
+                           max_mix_steps=args.rounds,
+                           encoded=args.encoded)
+
+        group.append(LLM(i, env, targeted=args.targeted, multiagent=(nLLM-1)))
+
+    return group
+
+
+def add_info_others(state):
+    return state
+
 def game(args):
+
+    group = setup(args)
 
     print("New game starts. \n")
 
-    if args.targeted:
-        description = "Combine the available items to make the target item"
-        env = gym.make("LittleAlchemy2TextTargeted-v0",
-                       seed=args.seed,
-                       max_mix_steps= args.rounds,
-                       num_distractors=args.distractors,
-                       max_depth=args.depth,
-                       encoded=args.encoded)
-    else:
-        description = "Combine the available items to make as many items as possible."
-        env = gym.make("LittleAlchemy2TextOpen-v0",
-                       seed=args.seed,
-                       max_mix_steps= args.rounds,
-                       encoded=args.encoded)
-    print(description)
 
-    env.reset()
-
-    state = env.render()
-    print(state)
 
     for i in range(args.rounds):
 
-        repeat = True
-        while repeat:
-            item1 = input('Choose the first item: ')
-            item2 = input('Choose the second item: ')
+        print("New round. Players: " + ' '.join([str(player.idx) for player in group if not player.done ]))
 
-            if item1 in env.table and item2 in env.table:
-                action = [int(env.table.index(item1)), int(env.table.index(item2))]
-                repeat = False
-            else:
-                print("The items you chose are not in the inventory, choose again.")
+        for player in group:
 
-        obs, reward, done, info = env.step(action)
+            if not player.done:
 
-        if done:
-            print("Nice! You found the target item in " + str(i+1) + " rounds")
-        state = env.render()
-        print(state)
+                if player.type == "human":
+                    print(player.description)
 
-    print("Nice! Your inventory has " + str(len(env.table)) + " items.")
-    print("Game ended")
+                other_envs = [other_player.env for other_player in group if other_player.idx != player.idx]
+
+                state = player.env.render(other_envs)
+                print(state)
+
+                action = player.move(state)
+
+                obs, reward, done, info = player.env.step(action)
+
+                if done:
+                    print("Nice! Player " + str(player.idx) + ", you found the target item in " + str(i+1) + " rounds")
+                    player.done = True
+
+
+    print("Nice! The game ended with: \n")
+    for player in group:
+        print("Player " + str(player.idx) + player.env.summarise())
+
 
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='LittleAlchemy2Text is a text-based version of the game Little Alchemy 2')
 
-    parser.add_argument('-N', '--nplayers', type=int, default=1, help='Number of players')
     parser.add_argument('-t', '--targeted', action='store_true', help='If true, task is targeted. Otherwise, the task is openended')
     parser.add_argument('-d', '--distractors', type=int,default=3, help='Number of distractors for targetd tasks')
     parser.add_argument('-de', '--depth', type=int,default=1, help='Depth for targeted tasks')
-
     parser.add_argument('-r', '--rounds', type=int, default=10, help='Number of crafting rounds in a single game')
     parser.add_argument('-s', '--seed', type=int, default=0, help='Seed for the task')
     parser.add_argument('-e', '--encoded', action='store_true', help="Encode the words into random strings.")
