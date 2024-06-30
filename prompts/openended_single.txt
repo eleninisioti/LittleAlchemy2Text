@@ -23,8 +23,8 @@ Task invalid combinations (do not repeat combinations here): a list of the combi
 
 Your response should contain only the following information:
 
-Combination: the two items you want to combine. Both items should be in your inventory
 Reasoning: based on the information in the INPUT, do reasoning about why you chose this combination
+Combination: the two items you want to combine. Both items should be in your inventory
 
 Here is a simple example:
 
@@ -34,8 +34,8 @@ Task valid combinations (do not repeat combinations here):
 Task invalid combinations (do not repeat combinations here):
 
 <bot> RESPONSE:
-Combination: 'science' and 'dinosaur'
 Reasoning: a scientist that studies dinosaurs is a paleontologist, which is a new item
+Combination: 'science' and 'dinosaur'
 
 <human> Here is an example that shows how that you can sometimes combine an element with itself:
 
@@ -44,8 +44,8 @@ Task valid combinations (do not repeat combinations here):
 Task invalid combinations (do not repeat combinations here):
 
 <bot> RESPONSE:
-Combination: 'wall' and 'wall'
 Reasoning: I can combine an element with itself so I will create a house by combining two walls
+Combination: 'wall' and 'wall'
 
 <human> Here is an example that shows how you can use the information provided in "Task valid combinations":
 
@@ -55,8 +55,8 @@ Task valid combinations (do not repeat combinations here): 'metal' and 'life -> 
 Task invalid combinations (do not repeat combinations here):
 
 <bot> RESPONSE:
-Combination: 'robot' and 'human'
 Reasoning: When I started this task 'robot' was not in my inventory. But I combined 'metal' and 'life' which gave the item 'robot'. This means that I cannot combine "metal" and "life" again. Now I can combine 'robot' and 'human' to make a 'cyborg' because a cyborg is a human with robotic parts.
+Combination: 'robot' and 'human'
 
 <human> Here is an example that shows how you can use the information provided in "Task invalid combinations":
 
@@ -66,8 +66,8 @@ Task valid combinations (do not repeat combinations here):
 Task invalid combinations (do not repeat combinations here): 'fire' and 'life'
 
 <bot> RESPONSE:
-Combination: 'metal' and 'life'
 Reasoning: In a previous round of this task I tried to combine 'fire' and 'life' and didn't get a new item. So I should not try this combo again.  I can combine 'metal' and 'life' to make a 'robot' because a robot is made of metal and behaves like a living organism.
+Combination: 'metal' and 'life'
 
 
 <human> Here is an example that shows you how to use the information in the error message:
@@ -79,13 +79,13 @@ Task invalid combinations (do not repeat combinations here):
 You have already combined 'metal' and 'life', so you cannot repeat it. Try another one.
 
 <bot> RESPONSE:
-Combination: 'robot' and 'human'
 Reasoning: I see in the Error message that I should not try combining 'metal' and 'life' because I have done it already. So I will make another combination.
+Combination: 'robot' and 'human'
 
 <human> Here are some clarifications:
 - To reason about which combinations to try, think about science! Combinations are inspired from the real world
 - Your combination can only contain items that are in the inventory
-- If a item is in your inventory, you do not need to create it again
+- If an item is in your inventory, you do not need to create it again
 - If you see a combination in 'Task valid combinations', you should not retry it as you already have the item.
 - If you see a combination in 'Task invalid combinations', you should not retry it as you already have the item.
 - Air, fire, earth and water will lead you to countless discoveries.

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Script Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 20px;
+        }
+        .form-container {
+            flex: 1.5; /* Adjust the size relative to the other section */
+            margin-right: 20px; /* Adjust distance from the right fields */
+            padding: 10px; /* Adjust padding inside the container */
+            border: 1px solid #ddd; /* Border around form container */
+            border-radius: 5px; /* Rounded corners for form container */
+            max-width: 500px; /* Set a maximum width */
+        }
+        .additional-fields {
+            flex: 1;
+            max-width: 400px; /* Increase the width of the additional fields */
+            margin-left: 20px; /* Distance from the left form */
+        }
+        .form-container form,
+        .additional-fields div {
+            margin-bottom: 10px;
+        }
+        .additional-fields p,
+        .additional-fields span {
+            margin: 5px 0;
+            padding: 15px; /* Increase padding for better spacing */
+            border: 1px solid #ddd; /* Optional: add border for visual separation */
+            background-color: #f9f9f9; /* Optional: add background color */
+            border-radius: 4px; /* Optional: rounded corners */
+            width: 100%; /* Ensure they take full width of their container */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        .additional-fields p {
+            background-color: transparent; /* Remove background for plain text appearance */
+            border: none; /* Remove border for plain text appearance */
+            padding: 0; /* Remove padding for plain text appearance */
+        }
+        .additional-fields span {
+            display: block; /* Ensure span behaves like a block element */
+        }
+        h2 {
+            margin-top: 0; /* Remove top margin for headers */
+            margin-bottom: 15px; /* Add spacing below headers */
+            font-size: 1.5em; /* Adjust font size as needed */
+        }
+    </style>
+    <script>
+        let gameStarted = false;
+
+        async function startGame() {
+            const response = await fetch('/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            document.getElementById('output').innerText = data.state;
+
+            // Update the additional fields
+            document.getElementById('startGameField').innerText = data.startGameField;
+            document.getElementById('otherField').innerText = ''; // Clear or set as needed
+
+            gameStarted = true;
+        }
+
+        async function updateState() {
+            if (!gameStarted) {
+                document.getElementById('output').innerText = 'Start the game first!';
+                return;
+            }
+
+            const firstItem = document.getElementById('firstItem').value;
+            const secondItem = document.getElementById('secondItem').value;
+
+            const response = await fetch('/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ firstItem, secondItem }),
+            });
+
+            const data = await response.json();
+            document.getElementById('output').innerText = data.state;
+
+            // Update the additional fields
+            document.getElementById('startGameField').innerText = data.startGameField;
+            document.getElementById('otherField').innerText = data.additionalMessage;
+        }
+
+        async function submitForm(event) {
+            event.preventDefault();
+            await updateState();
+        }
+    </script>
+</head>
+<body>
+    <h1>Play Little Alchemy 2 with a Large Language Model</h1>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>Human player</h2>
+            <button onclick="startGame()">Start Game</button>
+                <p id="output"></p>
+
+            <form onsubmit="submitForm(event)">
+                <label for="firstItem">Pick first item:</label>
+                <input type="text" id="firstItem" name="firstItem" required><br><br>
+
+                <label for="secondItem">Pick second item:</label>
+                <input type="text" id="secondItem" name="secondItem" required><br><br>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div class="additional-fields">
+            <h2>LLM player</h2>
+            <p id="startGameField">Start Game Field:</p>
+            <p>LLM game state:</p>
+            <span id="otherField"></span>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,11 +1,10 @@
 import sys
 import os
-sys.path.append(".")
+sys.path.append(os.getcwd())
 sys.path.append("env/wordcraft")
-
-import argparse
 import env.little_alchemy_2_text.openended.env
 import env.little_alchemy_2_text.targeted.env
+import argparse
 
 import gym
 from players.human import Human
@@ -67,27 +66,34 @@ def game(args):
 
     for i in range(args.rounds):
 
-        print("New round. Players: " + ' '.join([str(player.idx) for player in group if not player.done ]))
+        game_done = all([player.done for player in group])
+        if not game_done:
 
-        for player in group:
+            print("New round. Players: " + ' '.join([str(player.idx) for player in group if not player.done ]))
 
-            if not player.done:
+            for player in group:
 
-                if player.type == "human":
-                    print(player.description)
+                if not player.done:
 
-                other_envs = [other_player.env for other_player in group if other_player.idx != player.idx]
+                    if player.type == "human":
+                        print(player.description)
 
-                state = player.env.render(other_envs)
-                print(state)
+                    other_envs = [other_player.env for other_player in group if other_player.idx != player.idx]
 
-                action = player.move(state)
+                    state = player.env.render(other_envs)
+                    print(state)
 
-                obs, reward, done, info = player.env.step(action)
+                    repeat = True
 
-                if done:
-                    print("Nice! Player " + str(player.idx) + ", you found the target item in " + str(i+1) + " rounds")
-                    player.done = True
+                    while repeat:
+                        action = player.move(state)
+
+                        obs, reward, done, info = player.env.step(action)
+                        repeat = info["repeat"]
+
+                    if done:
+                        print("Nice! Player " + str(player.idx) + ", you found the target item in " + str(i+1) + " rounds")
+                        player.done = True
 
 
     print("Nice! The game ended with: \n")
@@ -95,7 +101,20 @@ def game(args):
         print("Player " + str(player.idx) + player.env.summarise())
 
 
+def play(targeted=True, distractors=3, depth=1, rounds=5, seed=5, encoded=False):
 
+    # Create a dictionary to serve as the namespace
+    args = {}
+
+    # Accessing the variables
+    args['targeted'] = targeted
+    args['distractors'] = distractors
+    args['depth'] = depth
+    args['rounds'] = rounds
+    args['seed'] = seed
+    args['encoded'] = encoded
+
+    game(args)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='LittleAlchemy2Text is a text-based version of the game Little Alchemy 2')

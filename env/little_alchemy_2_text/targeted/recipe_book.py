@@ -13,7 +13,6 @@ from utils.log import cprint
 
 
 DEBUG = False
-from env.wordcraft.wordcraft.recipe_book import RecipeBook as WordcraftRecipeBook
 
 class Recipe(collections.Counter):
     """A hashable recipe.
@@ -43,7 +42,7 @@ class Task:
         return tuple((self.goal, self.base_entities, self.intermediate_entities, self.relevant_recipes)).__hash__()
 
 
-class RecipeBook(WordcraftRecipeBook):
+class RecipeBook:
     def __init__(self,
         data_path='datasets/alchemy2.json', max_depth=1, split=None, train_ratio=1.0, seed=None):
         self.test_mode = False
