@@ -31,25 +31,36 @@ This is an API to various opensource LLMs, such as LLama 3, Phi 3 Mistral and Ge
 
 In order to be able to use a model you need to first pull it, e.g.
 
-    ollama pull llama 3
+    ollama pull llama3
 
-We have provided a script for illustrating how humans and LLMs can play a game.
-
-
-Upon running
+We have provided a script for illustrating how humans and LLMs can play a game. Upon running:
 
     python play.py
 
 you will be asked on how many human and LLM players there will be.
 
 
-## Web Interface
+### Web Interface
 
 We have also designed a web interface using Flask where a human can play alongside an LLM. 
 
 Try it out locally:
 
     python app.py
+
+
+## Cite this work
+
+If you use this code in your work, please cite our paper:
+
+    @article{nisioti_2024, 
+    title={Collective Innovation in Groups of Large Language Models},
+    author={Eleni Nisioti and Sebastian Risi and Pierre-Yves Oudeyer and Ida Momennejad and Clément Moulin-Frier},
+    year={2024},
+    booktitle = {The 2023 {Conference} on {Artificial} {Life}},
+    publisher = {MIT Press},
+    }
+    
 
 
 
