@@ -18,6 +18,7 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
 
     def __init__(self,
                  seed,
+                 encoded=False,
                  max_mix_steps=1,
                  max_depth=1,
                  split='by_recipe',
@@ -25,7 +26,7 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
                  num_distractors=0,
                  ):
 
-        super().__init__(seed, max_mix_steps)
+        super().__init__(seed=seed, max_mix_steps=max_mix_steps, encoded=encoded)
 
         self.num_distractors = num_distractors
         self.max_depth = max_depth
@@ -94,33 +95,19 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
         inventory = self.table
         target = self.task.goal
 
+        if self.encoded:
+            inventory = [self.encode(el) for el in inventory]
+            target = self.encode(target)
+
         remaining_rounds = self.max_mix_steps - self.episode_step
-        valid_combs = ""
-        counter = 0
-        for key, val in self.past_valid_combs.items():
-            subkeys = []
-            for subkey in key:
 
-                subkeys.append(str(self.index_to_word(subkey)))
-            new_key = '"' + subkeys[0] + '" and "' + subkeys[1]
-            val = str(self.index_to_word(val))
-            valid_combs += new_key + " -> " + val + " , "
-
-            counter = counter + 1
-            if counter > 15:
-                break
-        past_invalid_combs = self.past_invalid_combs
-        past_invalid_combs = past_invalid_combs[-15:]
-        past_invalid_combs_str = []
-        for el in past_invalid_combs:
-            past_invalid_combs_str.append('"' + str(self.index_to_word(el[0])) + '" and "' + str(self.index_to_word(el[1])) + '"')
-
+        valid_combs, past_invalid_combs = self._print_valid_and_invalid_combs()
         output = "\n<human> INPUT \n Inventory: '" + "', '".join(inventory) + "'"
         output += "\nTarget: '" + str(target) + "'"
         output += "\nRemaining rounds: " + str(remaining_rounds)
         output += "\nNumber of intermediate items: " + str(len(self.task.intermediate_entities))
         output += "\nTask valid combinations (do not repeat combinations here): " + valid_combs
-        output += "\nTask invalid combinations (do not repeat combinations here): " + ", ".join(past_invalid_combs_str)
+        output += "\nTask invalid combinations (do not repeat combinations here): " + ", ".join(past_invalid_combs)
         return output
 
 

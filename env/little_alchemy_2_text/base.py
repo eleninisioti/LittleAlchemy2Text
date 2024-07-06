@@ -5,7 +5,8 @@ import gym
 from utils.word2feature import FeatureMap
 import numpy as np
 from env.wordcraft.wordcraft.env import WordCraftEnv
-
+import random
+import string
 
 def find_nth(haystack, needle, n):
     """ Find the nth occurrence of sub-string in string.
@@ -21,6 +22,7 @@ class LittleAlchemy2Text(WordCraftEnv):
 
     def __init__(self,
                  seed=0,
+                 encoded=False,
                  max_mix_steps=1):
 
         self.feature_type = 'glove'
@@ -31,7 +33,10 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.data_path = "env/wordcraft/datasets/alchemy2.json" # database that contains the items
 
         self.max_mix_steps = max_mix_steps
+        self.encoded = encoded
         self.seed = seed
+
+        self.decode_dict = {}
 
         if seed is None:
             seed = int.from_bytes(os.urandom(4), byteorder="little")
@@ -97,6 +102,12 @@ class LittleAlchemy2Text(WordCraftEnv):
             'selection_features': self.selection_features,
         }
 
+    def decode(self, encoded):
+        if encoded in self.decode_dict.keys():
+            return self.decode_dict[encoded]
+        else:
+            return None
+
     def _string_to_actions(self, actions):
 
         start_first = find_nth(actions, "Combination: '", 1)
@@ -104,9 +115,13 @@ class LittleAlchemy2Text(WordCraftEnv):
         start_first = find_nth(actions, "Combination: '", 1)
         end_first = find_nth(actions, "'", 2)
         first_word = actions[start_first + len("Combination: '"):end_first]
-
         end_second = find_nth(actions, "'", 4)
         second_word = actions[(end_first + 7): end_second]
+
+        if self.encoded:
+            first_word = self.decode(first_word)
+            second_word = self.decode(second_word)
+
 
         if first_word in self.table and second_word in self.table:
             action = [int(self.table.index(first_word)), int(self.table.index(second_word))]
@@ -282,6 +297,49 @@ class LittleAlchemy2Text(WordCraftEnv):
             valid_combs += new_key + " -> " + val + " , "
         return valid_combs, len(past_valid_combs)
 
+    def encode(self, word):
+        length = 5
+        random.seed(word)
+        letters = string.ascii_lowercase
+
+        encoded = ''.join(random.choice(letters) for i in range(length))
+
+        self.decode_dict[encoded] = word
+        return encoded
+
+    def _print_valid_and_invalid_combs(self):
+        valid_combs = ""
+        counter = 0
+        for key, val in self.past_valid_combs.items():
+            subkeys = []
+            val = str(self.index_to_word(val))
+            for subkey in key:
+                if self.encoded:
+                    subkeys.append(str(self.encode(self.index_to_word(subkey))))
+                    val = self.encode(val)
+                else:
+                    subkeys.append(str(self.index_to_word(subkey)))
+
+            new_key = '"' + subkeys[0] + '" and "' + subkeys[1]
+            valid_combs += new_key + " -> " + val + " , "
+
+            counter = counter + 1
+            if counter > 15:  # arbitrary maximum number of combinations to keep the LLM prompt limited
+                break
+
+        past_invalid_combs = self.past_invalid_combs
+        past_invalid_combs = past_invalid_combs[-15:]
+        past_invalid_combs_str = []
+        for element in past_invalid_combs:
+            if self.encoded:
+                past_invalid_combs_str.append(
+                    '"' + str(self.encode(self.index_to_word(element[0]))) + '" and "' + str(
+                        self.encode(self.index_to_word(element[1]))) + '"')
+            else:
+                past_invalid_combs_str.append(
+                    '"' + str(self.index_to_word(element[0])) + '" and "' + str(self.index_to_word(element[1])) + '"')
+
+        return valid_combs, past_invalid_combs
     def get_valid_combs(self):
         """Returns invalid combinations as a string"""
         past_valid_combs = list(self.past_valid_combs.keys())

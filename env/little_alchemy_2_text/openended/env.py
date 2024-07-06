@@ -16,9 +16,10 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
     def __init__(self,
                  seed,
+                 encoded=False,
                  max_mix_steps=1):
 
-        super().__init__(seed, max_mix_steps)
+        super().__init__(seed=seed, max_mix_steps=max_mix_steps, encoded=encoded)
 
         self.num_distractors = 0
         self.max_depth = 1
@@ -48,6 +49,8 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
     def step(self, actions):
 
+
+
         selection, new_comb, actions = self._parse_actions(actions)
 
         if selection is None:
@@ -66,31 +69,14 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
     def _display_llm(self):
         inventory = self.table
 
-        valid_combs = ""
-        counter = 0
-        for key, val in self.past_valid_combs.items():
-            subkeys = []
-            for subkey in key:
-                subkeys.append(str(self.index_to_word(subkey)))
-            new_key = '"' + subkeys[0] + '" and "' + subkeys[1]
-            val = str(self.index_to_word(val))
-            valid_combs += new_key + " -> " + val + " , "
+        if self.encoded:
+            inventory = [self.encode(el) for el in inventory]
 
-            counter = counter + 1
-            if counter > 15:
-                break
-
-        past_invalid_combs = self.past_invalid_combs
-
-        past_invalid_combs = past_invalid_combs[-15:]
-        past_invalid_combs_str = []
-        for element in past_invalid_combs:
-            past_invalid_combs_str.append(
-                '"' + str(self.index_to_word(element[0])) + '" and "' + str(self.index_to_word(element[1])) + '"')
+        valid_combs, past_invalid_combs = self._print_valid_and_invalid_combs()
 
         output = "\n<human> INPUT \n Inventory: '" + "', '".join(inventory) + "'"
         output += "\nTask valid combinations (do not repeat combinations here): " + valid_combs
-        output += "\nTask invalid combinations (do not repeat combinations here): " + ", ".join(past_invalid_combs_str)
+        output += "\nTask invalid combinations (do not repeat combinations here): " + ", ".join(past_invalid_combs)
         return output
 
 

@@ -18,8 +18,23 @@ from players.LLM import LLM
 
 
 def setup(args):
-    nhuman = int(input('How many human players are there?'))
-    nLLM = int(input('How many LLM players are there?'))
+
+    input_incorrect = True
+    while input_incorrect:
+
+        try:
+            nhuman = int(input('How many human players are there?'))
+            input_incorrect = False
+        except ValueError:
+            print("Wrong input, pick an integer.")
+
+    input_incorrect = True
+    while input_incorrect:
+        try:
+            nLLM = int(input('How many LLM players are there?'))
+            input_incorrect = False
+        except ValueError:
+            print("Wrong input, pick an integer.")
 
     group = []
     for i in range(nhuman):
@@ -29,12 +44,14 @@ def setup(args):
                            seed=args.seed,
                            max_mix_steps=args.rounds,
                            num_distractors=args.distractors,
-                           max_depth=args.depth)
+                           max_depth=args.depth,
+                           encoded=args.encoded)
         else:
             task_descript = "Combine the available items to make as many items as possible."
             env = gym.make("LittleAlchemy2TextOpen-v0",
                            seed=args.seed,
-                           max_mix_steps=args.rounds)
+                           max_mix_steps=args.rounds,
+                           encoded=args.encoded)
         group.append(Human(i, env, task_descript))
 
     for i in range(nhuman, nhuman + nLLM):
@@ -43,11 +60,13 @@ def setup(args):
                            seed=args.seed,
                            max_mix_steps=args.rounds,
                            num_distractors=args.distractors,
-                           max_depth=args.depth)
+                           max_depth=args.depth,
+                           encoded=args.encoded)
         else:
             env = gym.make("LittleAlchemy2TextOpen-v0",
                            seed=args.seed,
-                           max_mix_steps=args.rounds)
+                           max_mix_steps=args.rounds,
+                           encoded=args.encoded)
 
         group.append(LLM(i, env, targeted=args.targeted, multiagent=(nLLM - 1)))
 
@@ -96,7 +115,7 @@ def game(args):
         print("Player " + str(player.idx) + player.env.summarise())
 
 
-def play(targeted=True, distractors=3, depth=1, rounds=5, seed=5):
+def play(targeted=True, distractors=3, depth=1, rounds=5, seed=5, encoded=False):
 
 
     args = {}
@@ -105,6 +124,7 @@ def play(targeted=True, distractors=3, depth=1, rounds=5, seed=5):
     args['depth'] = depth
     args['rounds'] = rounds
     args['seed'] = seed
+    args['encoded'] = encoded
 
     game(args)
 
@@ -119,6 +139,7 @@ if __name__ == "__main__":
     parser.add_argument('-de', '--depth', type=int, default=1, help='Depth for targeted tasks')
     parser.add_argument('-r', '--rounds', type=int, default=10, help='Number of crafting rounds in a single game')
     parser.add_argument('-s', '--seed', type=int, default=0, help='Seed for the task')
+    parser.add_argument('-e', '--encoded', action='store_true', help="Encode the words into random strings.")
 
     args = parser.parse_args()
 
