@@ -9,7 +9,7 @@ Alchemy 2 that enabled playing the game with reinforcement learning agents.
 How did we extend Wordcraft?
 
 * added open-ended tasks. These start with the same items that Little Alchemy 2 starts with and have no target item
-* added support for multiple agents. The agents are not in the same environment but receive information about the environments of others
+* added support for multiple agents. The agents are not in the same environment but receive information about the actions of others
 * engineered prompts for instructing LLMs to play the task
 * some bug fixes (eg ensuring that tasks are set deterministically by the seed, dealing with items missing from the data base)
 
@@ -37,16 +37,9 @@ We have provided a script for illustrating how humans and LLMs can play a game. 
 
     python play.py
 
-you will be asked on how many human and LLM players there will be.
+you will be asked how many human and LLM players there will be. Human players will need to perform actions through the command line.
 
 
-### Web Interface
-
-We have also designed a web interface using Flask where a human can play alongside an LLM. 
-
-Try it out locally:
-
-    python app.py
 
 
 ## Cite this work
@@ -55,7 +48,7 @@ If you use this code in your work, please cite our paper:
 
     @article{nisioti_2024, 
     title={Collective Innovation in Groups of Large Language Models},
-    author={Eleni Nisioti and Sebastian Risi and Pierre-Yves Oudeyer and Ida Momennejad and Clément Moulin-Frier},
+    author={Eleni Nisioti and Sebastian Risi and Ida Momennejad and Pierre-Yves Oudeyer and Clément Moulin-Frier},
     year={2024},
     booktitle = {The 2023 {Conference} on {Artificial} {Life}},
     publisher = {MIT Press},

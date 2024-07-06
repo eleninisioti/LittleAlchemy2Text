@@ -62,8 +62,6 @@ class RecipeBook:
 
 
 
-
-
     def _random_choice(self, options):
         # Fast random choice
         i = self.np_random.integers(0, len(options))

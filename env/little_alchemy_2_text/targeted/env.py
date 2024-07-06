@@ -11,10 +11,6 @@ NO_RECIPE_PENALTY = 0
 IRRELEVANT_RECIPE_PENALTY = -0.1
 GOAL_REWARD = 1.0
 SUBGOAL_REWARD = 1.0
-from utils import seed as utils_seed
-from utils.word2feature import FeatureMap
-import random
-import string
 from env.little_alchemy_2_text.targeted.recipe_book import Recipe, RecipeBook
 from env.little_alchemy_2_text.base import LittleAlchemy2Text
 
@@ -63,10 +59,6 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
         return self._get_observation()
 
     def _get_observation(self):
-        """
-        Note, includes indices for each inventory and selection item,
-        since torchbeast stores actions in a shared_memory tensor shared among actor processes
-        """
         return {
             'goal_index': [self.recipe_book.entity2index[self.task.goal]],
             'goal_features': self.goal_features,
@@ -124,12 +116,6 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
             counter = counter + 1
             if counter > 15:
                 break
-
-        #if self.encoded:
-        #    past_invalid_combs = [self.encode(el) for el in self.past_invalid_combs]
-
-        #else:
-        #    past_invalid_combs = self.past_invalid_combs
         past_invalid_combs = self.past_invalid_combs
         past_invalid_combs = past_invalid_combs[-15:]
         past_invalid_combs_str = []

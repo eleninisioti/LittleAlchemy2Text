@@ -1,20 +1,16 @@
+""" Contains the implementation of an open-ended task.
+"""
+
 import gym
 from env.little_alchemy_2_text.openended.recipe_book import Recipe, RecipeBook
 from gym.envs.registration import register
-from utils import seed as utils_seed
-from utils.word2feature import FeatureMap
-import numpy as np
+from env.little_alchemy_2_text.base import LittleAlchemy2Text
 
-import os
 NO_RECIPE_PENALTY = -0.1
 IRRELEVANT_RECIPE_PENALTY = -0.1
 GOAL_REWARD = 1.0
 SUBGOAL_REWARD = 1.0
 
-import random
-import string
-
-from env.little_alchemy_2_text.base import LittleAlchemy2Text
 
 class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
@@ -28,15 +24,11 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
         self.num_distractors = 0
         self.max_depth = 1
 
-
-
         self.recipe_book = RecipeBook(
             data_path=self.data_path,
-        seed=self.seed)
-
+            seed=self.seed)
 
         self._setup(self.recipe_book)
-
 
         num_entities = len(self.recipe_book.entities)
 
@@ -48,25 +40,12 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
         }
         self.observation_space = gym.spaces.Dict(dspaces)
 
-
-
     def reset(self):
         self.distractors = []
-
         return super().reset()
 
-
     def _get_observation(self):
-        """
-        Note, includes indices for each inventory and selection item,
-        since torchbeast stores actions in a shared_memory tensor shared among actor processes
-        """
-        return {
-            'table_index': self.table_index,
-            'table_features': self.table_features,
-            'selection_index': self.selection_index,
-            'selection_features': self.selection_features,
-        }
+        super()._get_observation()
 
     def step(self, actions):
 
@@ -82,10 +61,7 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
             return obs, reward, self.done, info
 
-
-
     def summarise(self):
-
         return " having " + str(len(self.table)) + " items in their inventory"
 
     def _display_llm(self):
@@ -97,7 +73,6 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
         for key, val in self.past_valid_combs.items():
             subkeys = []
             for subkey in key:
-
                 subkeys.append(str(self.index_to_word(subkey)))
             new_key = '"' + subkeys[0] + '" and "' + subkeys[1]
             val = str(self.index_to_word(val))
@@ -119,8 +94,8 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
         past_invalid_combs = past_invalid_combs[-15:]
         past_invalid_combs_str = []
         for element in past_invalid_combs:
-
-            past_invalid_combs_str.append('"' + str(self.index_to_word(element[0])) + '" and "' + str(self.index_to_word(element[1])) + '"')
+            past_invalid_combs_str.append(
+                '"' + str(self.index_to_word(element[0])) + '" and "' + str(self.index_to_word(element[1])) + '"')
 
         if self.encoded:
             self.env.table = [self.encode(el) for el in self.env.table]
@@ -131,10 +106,7 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
         return output
 
 
-
-
 register(
     id='LittleAlchemy2TextOpen-v0',
     entry_point='env.little_alchemy_2_text.openended.env:LittleAlchemy2TextOpen',
 )
-

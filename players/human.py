@@ -1,21 +1,21 @@
+""" A human player is asked to combine two items in each round through the command line.
+"""
 
-from flask import Flask, request, jsonify, render_template
 
 class Human():
 
     def __init__(self, idx, env, task_descript):
-        self.idx = idx
+        self.idx = idx # id in the group
+        self.type = "human"
+
         self.env = env
         self.done = False
-        self.description= task_descript
-
-        self.type = "human"
+        self.description = task_descript
 
         self.env.reset()
 
     def move(self, state):
-        item1 = input('Player ' + str(self.idx) + ', choose the first item: ')
-        item2 = input('Player ' + str(self.idx) + ', choose the second item: ')
-
+        item1 = input('Player ' + str(self.idx) + ', you may choose the first item: ')
+        item2 = input('Player ' + str(self.idx) + ', you may choose the second item: ')
         action = "Combination: '" + item1 + "' and '" + item2 + "'"
         return action

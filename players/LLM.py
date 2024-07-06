@@ -1,11 +1,13 @@
-import ollama
+""" An LLM player is provided with a prompt describing the task and the current state of the environment.
+"""
 
+import ollama
 
 
 class LLM:
 
     def __init__(self, idx, env, targeted, multiagent):
-        self.idx = idx
+        self.idx = idx  # id the group
         self.env = env
         self.done = False
 
@@ -27,15 +29,9 @@ class LLM:
         temp = open(prompt_file, 'r').readlines()
         self.intro = " ".join(temp)
 
-
-
-
     def move(self, state):
 
         state = self.intro + "\n<bot> RESPONSE:\n" + state
-
-
-
 
         response = ollama.chat(model='llama3', messages=[
             {
@@ -44,6 +40,5 @@ class LLM:
             },
         ])
         response = response['message']['content']
-
 
         return response

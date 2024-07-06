@@ -1,11 +1,11 @@
-
+""" Contains the Base class that implements a LittleAlchemy2Text environment the open-ended and targeted tasks inherit."""
 import os
 from utils import seed as utils_seed
 import gym
 from utils.word2feature import FeatureMap
 import numpy as np
-from gym.utils import seeding
 from env.wordcraft.wordcraft.env import WordCraftEnv
+
 
 def find_nth(haystack, needle, n):
     """ Find the nth occurrence of sub-string in string.
@@ -16,6 +16,7 @@ def find_nth(haystack, needle, n):
         n -= 1
     return start
 
+
 class LittleAlchemy2Text(WordCraftEnv):
 
     def __init__(self,
@@ -25,14 +26,13 @@ class LittleAlchemy2Text(WordCraftEnv):
 
         self.feature_type = 'glove'
         self.shuffle_features = False
-        self.random_feature_size=300
-        self.uniform_distractors=False
+        self.random_feature_size = 300
+        self.uniform_distractors = False
         self.eval_mode = False
-        self.data_path = "env/wordcraft/datasets/alchemy2.json"
+        self.data_path = "env/wordcraft/datasets/alchemy2.json" # database that contains the items
 
         self.max_mix_steps = max_mix_steps
         self.seed = seed
-
 
         if seed is None:
             seed = int.from_bytes(os.urandom(4), byteorder="little")
@@ -89,15 +89,10 @@ class LittleAlchemy2Text(WordCraftEnv):
 
         return self._get_observation()
 
-
     def _reset_history(self):
         self.subgoal_history = {}
 
     def _get_observation(self):
-        """
-        Note, includes indices for each inventory and selection item,
-        since torchbeast stores actions in a shared_memory tensor shared among actor processes
-        """
         return {
             'table_index': self.table_index,
             'table_features': self.table_features,
@@ -111,10 +106,10 @@ class LittleAlchemy2Text(WordCraftEnv):
         actions = actions[start_first:]
         start_first = find_nth(actions, "Combination: '", 1)
         end_first = find_nth(actions, "'", 2)
-        first_word = actions[start_first+len("Combination: '"):end_first]
+        first_word = actions[start_first + len("Combination: '"):end_first]
 
         end_second = find_nth(actions, "'", 4)
-        second_word = actions[(end_first+7): end_second]
+        second_word = actions[(end_first + 7): end_second]
 
         if first_word in self.table and second_word in self.table:
             action = [int(self.table.index(first_word)), int(self.table.index(second_word))]
@@ -158,7 +153,6 @@ class LittleAlchemy2Text(WordCraftEnv):
         else:
             new_comb = "'" + e + "'"
 
-
         selection_size = len(self.selection)
         self.selection.append(e)
         self.selection_index[selection_size] = i
@@ -176,7 +170,6 @@ class LittleAlchemy2Text(WordCraftEnv):
         else:
             new_comb += " and '" + e + "'"
 
-
         selection_size = len(self.selection)
         self.selection.append(e)
         self.selection_index[selection_size] = i
@@ -186,7 +179,7 @@ class LittleAlchemy2Text(WordCraftEnv):
         selection = self.selection
         return selection, new_comb, actions
 
-    def _step(self, recipe, new_comb,  actions):
+    def _step(self, recipe, new_comb, actions):
         result = self.recipe_book.evaluate_recipe(recipe)
 
         if result is None:
@@ -203,7 +196,6 @@ class LittleAlchemy2Text(WordCraftEnv):
                 self.table.append(result)
                 self.table_index[table_size] = result_i
                 self.table_features[table_size, :] = self.feature_map.feature(result)
-
 
         # Clear selection
         self._reset_selection()
@@ -225,19 +217,11 @@ class LittleAlchemy2Text(WordCraftEnv):
                 self.past_valid_combs[tuple(actions)] = self.table.index(result)
         return result, obs, reward, self.done, info
 
-    def encode(self, word):
-        length = 5
-        random.seed(word)
-        letters = string.ascii_lowercase
-        return ''.join(random.choice(letters) for i in range(length))
-
     def index_to_word(self, index):
         return self.table[index]
 
     def word_to_index(self, word):
         items = list(self.recipe_book.entities)
-        if self.encoded:
-            items = [self.encode[el] for el in items]
         return items.index(word)
 
     def render(self, envs, mode='human'):
@@ -248,7 +232,6 @@ class LittleAlchemy2Text(WordCraftEnv):
             social_info = self._display_social(envs)
             info = info + "\n" + social_info
         return info
-
 
     def _display_social(self, envs):
         social_info = "Other players valid combinations: "
@@ -287,7 +270,6 @@ class LittleAlchemy2Text(WordCraftEnv):
 
         return social_info
 
-
     def invalid_combs_to_string(self, past_invalid_combs):
         past_invalid_combs_str = ""
         for element in past_invalid_combs:
@@ -297,11 +279,7 @@ class LittleAlchemy2Text(WordCraftEnv):
 
     def get_invalid_combs(self):
         "Returns invalid combinations as a string"
-        if self.encoded:
-            past_invalid_combs = [self.encode(el) for el in self.past_invalid_combs]
-
-        else:
-            past_invalid_combs = self.past_invalid_combs
+        past_invalid_combs = self.past_invalid_combs
 
         return past_invalid_combs[-15:], len(past_invalid_combs[-15:])
 
@@ -315,26 +293,16 @@ class LittleAlchemy2Text(WordCraftEnv):
                 subkeys.append(str(self.index_to_word(subkey)))
             new_key = '"' + subkeys[0] + '" and "' + subkeys[1]
             val = str(self.index_to_word(val))
-            if self.encoded:
-                valid_combs += new_key + " -> " + self.encode(val) + " , "
-            else:
-                valid_combs += new_key + " -> " + val + " , "
+            valid_combs += new_key + " -> " + val + " , "
         return valid_combs, len(past_valid_combs)
 
     def get_valid_combs(self):
-        "Returns invalid combinations as a string"
+        """Returns invalid combinations as a string"""
         past_valid_combs = list(self.past_valid_combs.keys())
-
         return past_valid_combs, len(past_valid_combs)
-
-
 
     def summarise(self):
         pass
+
     def _display_llm(self):
         pass
-
-
-
-
-
