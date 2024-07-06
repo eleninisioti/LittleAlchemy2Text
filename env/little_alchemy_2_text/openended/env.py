@@ -16,10 +16,9 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
     def __init__(self,
                  seed,
-                 max_mix_steps=1,
-                 encoded=False):
+                 max_mix_steps=1):
 
-        super().__init__(seed, encoded, max_mix_steps)
+        super().__init__(seed, max_mix_steps)
 
         self.num_distractors = 0
         self.max_depth = 1
@@ -45,7 +44,7 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
         return super().reset()
 
     def _get_observation(self):
-        super()._get_observation()
+        return super()._get_observation()
 
     def step(self, actions):
 
@@ -66,8 +65,7 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
     def _display_llm(self):
         inventory = self.table
-        if self.encoded:
-            inventory = [self.encode(el) for el in inventory]
+
         valid_combs = ""
         counter = 0
         for key, val in self.past_valid_combs.items():
@@ -76,29 +74,19 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
                 subkeys.append(str(self.index_to_word(subkey)))
             new_key = '"' + subkeys[0] + '" and "' + subkeys[1]
             val = str(self.index_to_word(val))
-            if self.encoded:
-                valid_combs += new_key + " -> " + self.encode(val) + " , "
-            else:
-                valid_combs += new_key + " -> " + val + " , "
+            valid_combs += new_key + " -> " + val + " , "
 
             counter = counter + 1
             if counter > 15:
                 break
 
-        if self.encoded:
-            past_invalid_combs = [self.encode(el) for el in self.past_invalid_combs]
-
-        else:
-            past_invalid_combs = self.past_invalid_combs
+        past_invalid_combs = self.past_invalid_combs
 
         past_invalid_combs = past_invalid_combs[-15:]
         past_invalid_combs_str = []
         for element in past_invalid_combs:
             past_invalid_combs_str.append(
                 '"' + str(self.index_to_word(element[0])) + '" and "' + str(self.index_to_word(element[1])) + '"')
-
-        if self.encoded:
-            self.env.table = [self.encode(el) for el in self.env.table]
 
         output = "\n<human> INPUT \n Inventory: '" + "', '".join(inventory) + "'"
         output += "\nTask valid combinations (do not repeat combinations here): " + valid_combs

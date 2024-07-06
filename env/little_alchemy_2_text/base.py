@@ -21,7 +21,6 @@ class LittleAlchemy2Text(WordCraftEnv):
 
     def __init__(self,
                  seed=0,
-                 encoded=False,
                  max_mix_steps=1):
 
         self.feature_type = 'glove'
@@ -38,9 +37,7 @@ class LittleAlchemy2Text(WordCraftEnv):
             seed = int.from_bytes(os.urandom(4), byteorder="little")
         self.set_seed(seed)
         utils_seed(seed)
-
         self.success = False
-        self.encoded = encoded
 
     def _setup(self, recipe_book):
 
@@ -147,11 +144,7 @@ class LittleAlchemy2Text(WordCraftEnv):
         action = actions[0]
         i = self.table_index[action]
         e = self.recipe_book.entities[i]
-        if self.encoded:
-            new_comb = "'" + self.encode(e) + "'"
-
-        else:
-            new_comb = "'" + e + "'"
+        new_comb = "'" + e + "'"
 
         selection_size = len(self.selection)
         self.selection.append(e)
@@ -164,11 +157,7 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.episode_mix_steps += 1
         i = self.table_index[action]
         e = self.recipe_book.entities[i]
-        if self.encoded:
-            new_comb += " and '" + self.encode(e) + "'"
-
-        else:
-            new_comb += " and '" + e + "'"
+        new_comb += " and '" + e + "'"
 
         selection_size = len(self.selection)
         self.selection.append(e)
@@ -248,10 +237,7 @@ class LittleAlchemy2Text(WordCraftEnv):
                     subkeys.append(str(env.index_to_word(subkey)))
                 new_key = "'" + subkeys[0] + "' and '" + subkeys[1] + "'"
                 val = str(env.index_to_word(val))
-                if env.encoded:
-                    valid_combs += new_key + " -> '" + self.encode(val) + "' , "
-                else:
-                    valid_combs += new_key + " -> '" + val + "' , "
+                valid_combs += new_key + " -> '" + val + "' , "
 
                 counter = counter + 1
                 if counter > 15:

@@ -19,14 +19,13 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
     def __init__(self,
                  seed,
                  max_mix_steps=1,
-                 encoded=False,
                  max_depth=1,
                  split='by_recipe',
                  train_ratio=1.0,
                  num_distractors=0,
                  ):
 
-        super().__init__(seed, encoded, max_mix_steps)
+        super().__init__(seed, max_mix_steps)
 
         self.num_distractors = num_distractors
         self.max_depth = max_depth
@@ -95,9 +94,6 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
         inventory = self.table
         target = self.task.goal
 
-        if self.encoded:
-            inventory = [self.encode(el) for el in inventory]
-            target = self.encode(target)
         remaining_rounds = self.max_mix_steps - self.episode_step
         valid_combs = ""
         counter = 0
@@ -108,10 +104,7 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
                 subkeys.append(str(self.index_to_word(subkey)))
             new_key = '"' + subkeys[0] + '" and "' + subkeys[1]
             val = str(self.index_to_word(val))
-            if self.encoded:
-                valid_combs += new_key + " -> " + self.encode(val) + " , "
-            else:
-                valid_combs += new_key + " -> " + val + " , "
+            valid_combs += new_key + " -> " + val + " , "
 
             counter = counter + 1
             if counter > 15:
@@ -121,10 +114,6 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
         past_invalid_combs_str = []
         for el in past_invalid_combs:
             past_invalid_combs_str.append('"' + str(self.index_to_word(el[0])) + '" and "' + str(self.index_to_word(el[1])) + '"')
-
-        if self.encoded:
-            self.env.env.table = [self.encode(el) for el in self.env.env.table]
-
 
         output = "\n<human> INPUT \n Inventory: '" + "', '".join(inventory) + "'"
         output += "\nTarget: '" + str(target) + "'"

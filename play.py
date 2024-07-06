@@ -29,14 +29,12 @@ def setup(args):
                            seed=args.seed,
                            max_mix_steps=args.rounds,
                            num_distractors=args.distractors,
-                           max_depth=args.depth,
-                           encoded=args.encoded)
+                           max_depth=args.depth)
         else:
             task_descript = "Combine the available items to make as many items as possible."
             env = gym.make("LittleAlchemy2TextOpen-v0",
                            seed=args.seed,
-                           max_mix_steps=args.rounds,
-                           encoded=args.encoded)
+                           max_mix_steps=args.rounds)
         group.append(Human(i, env, task_descript))
 
     for i in range(nhuman, nhuman + nLLM):
@@ -45,13 +43,11 @@ def setup(args):
                            seed=args.seed,
                            max_mix_steps=args.rounds,
                            num_distractors=args.distractors,
-                           max_depth=args.depth,
-                           encoded=args.encoded)
+                           max_depth=args.depth)
         else:
             env = gym.make("LittleAlchemy2TextOpen-v0",
                            seed=args.seed,
-                           max_mix_steps=args.rounds,
-                           encoded=args.encoded)
+                           max_mix_steps=args.rounds)
 
         group.append(LLM(i, env, targeted=args.targeted, multiagent=(nLLM - 1)))
 
