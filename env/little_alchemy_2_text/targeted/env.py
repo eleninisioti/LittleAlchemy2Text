@@ -27,6 +27,7 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
                  ):
 
         super().__init__(seed=seed, max_mix_steps=max_mix_steps, encoded=encoded)
+        self.Recipe = Recipe
 
         self.num_distractors = num_distractors
         self.max_depth = max_depth
@@ -77,7 +78,7 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
         else:
             recipe = Recipe(selection)
 
-            result, obs, reward, self.done, info = super()._step(recipe, new_comb, actions)
+            result, obs, reward, _, info = super()._step(recipe, new_comb, actions)
             info["repeat"] = False
 
             if result == self.task.goal:
@@ -107,7 +108,7 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
         output += "\nRemaining rounds: " + str(remaining_rounds)
         output += "\nNumber of intermediate items: " + str(len(self.task.intermediate_entities))
         output += "\nTask valid combinations (do not repeat combinations here): " + valid_combs
-        output += "\nTask invalid combinations (do not repeat combinations here): " + ", ".join(past_invalid_combs)
+        output += "\nTask invalid combinations (do not repeat combinations here): " + past_invalid_combs
         return output
 
 

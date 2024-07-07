@@ -30,18 +30,21 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.random_feature_size = 300
         self.uniform_distractors = False
         self.eval_mode = False
-        self.data_path = "env/wordcraft/datasets/alchemy2.json" # database that contains the items
+
+        self.data_path = "LittleAlchemy2Text/env/wordcraft/datasets/alchemy2.json"
 
         self.max_mix_steps = max_mix_steps
         self.encoded = encoded
         self.seed = seed
 
-        self.decode_dict = {}
-
         if seed is None:
             seed = int.from_bytes(os.urandom(4), byteorder="little")
         self.set_seed(seed)
         utils_seed(seed)
+
+        self.decode_dict = {}
+
+
         self.success = False
 
     def _setup(self, recipe_book):
@@ -61,6 +64,8 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.task = None
         self.distractors = tuple([])
         self.goal_features = np.zeros(self.feature_map.feature_dim)
+
+
 
         self._reset_table()
         self._reset_selection()
@@ -82,6 +87,8 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.episode_mix_steps = 0
         self.episode_reward = 0
         self.done = False
+
+
 
         self.task = self.recipe_book.sample_task()
 
@@ -107,6 +114,12 @@ class LittleAlchemy2Text(WordCraftEnv):
             return self.decode_dict[encoded]
         else:
             return None
+
+    def get_inventory(self):
+        inventory = self.table
+        if self.encoded:
+            inventory = [self.encode(el) for el in inventory]
+        return inventory
 
     def _string_to_actions(self, actions):
 
@@ -339,6 +352,10 @@ class LittleAlchemy2Text(WordCraftEnv):
                 past_invalid_combs_str.append(
                     '"' + str(self.index_to_word(element[0])) + '" and "' + str(self.index_to_word(element[1])) + '"')
 
+        if len(past_invalid_combs):
+            past_invalid_combs = ", ".join(past_invalid_combs_str)
+        else:
+            past_invalid_combs = ""
         return valid_combs, past_invalid_combs
     def get_valid_combs(self):
         """Returns invalid combinations as a string"""

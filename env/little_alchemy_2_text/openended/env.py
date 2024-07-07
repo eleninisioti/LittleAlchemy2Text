@@ -16,10 +16,11 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
     def __init__(self,
                  seed,
+                 data_path,
                  encoded=False,
                  max_mix_steps=1):
 
-        super().__init__(seed=seed, max_mix_steps=max_mix_steps, encoded=encoded)
+        super().__init__(seed=seed, data_path=data_path, max_mix_steps=max_mix_steps, encoded=encoded)
 
         self.num_distractors = 0
         self.max_depth = 1
@@ -40,9 +41,11 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
         }
         self.observation_space = gym.spaces.Dict(dspaces)
 
-    def reset(self):
+    def reset(self, seed):
         self.distractors = []
-        return super().reset()
+        super().reset(seed)
+
+        return self._get_observation()
 
     def _get_observation(self):
         return super()._get_observation()
@@ -76,7 +79,7 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
         output = "\n<human> INPUT \n Inventory: '" + "', '".join(inventory) + "'"
         output += "\nTask valid combinations (do not repeat combinations here): " + valid_combs
-        output += "\nTask invalid combinations (do not repeat combinations here): " + ", ".join(past_invalid_combs)
+        output += "\nTask invalid combinations (do not repeat combinations here): " + past_invalid_combs
         return output
 
 
