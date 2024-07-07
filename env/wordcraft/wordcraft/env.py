@@ -99,7 +99,7 @@ class WordCraftEnv(gym.Env):
 		self.observation_space = gym.spaces.Dict(dspaces)
 		self.action_space = gym.spaces.Discrete(self.max_table_size) # Actions correspond to choosing an entity in a table position
 
-	def reset(self):
+	def reset(self, seed):
 		self.episode_step = 0
 		self.episode_mix_steps = 0
 		self.episode_reward = 0

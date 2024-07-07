@@ -21,7 +21,6 @@ def find_nth(haystack, needle, n):
 class LittleAlchemy2Text(WordCraftEnv):
 
     def __init__(self,
-                 seed=0,
                  encoded=False,
                  max_mix_steps=1):
 
@@ -31,23 +30,21 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.uniform_distractors = False
         self.eval_mode = False
 
+        self.env_dir = "LittleAlchemy2Text/env/little_alchemy_2_text"
+
         self.data_path = "LittleAlchemy2Text/env/wordcraft/datasets/alchemy2.json"
 
         self.max_mix_steps = max_mix_steps
         self.encoded = encoded
-        self.seed = seed
-
-        if seed is None:
-            seed = int.from_bytes(os.urandom(4), byteorder="little")
+        seed = int.from_bytes(os.urandom(4), byteorder="little")
         self.set_seed(seed)
         utils_seed(seed)
 
         self.decode_dict = {}
 
-
         self.success = False
 
-    def _setup(self, recipe_book):
+    def _setup(self):
 
         self.feature_map = FeatureMap(
             words=self.recipe_book.entities,
@@ -79,7 +76,9 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.action_space = gym.spaces.Discrete(
             self.max_table_size)  # Actions correspond to choosing an entity in a table position
 
-    def reset(self):
+    def reset(self, seed):
+
+        self.seed = seed
         self.past_invalid_combs = []
         self.past_valid_combs = {}
 
@@ -88,9 +87,7 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.episode_reward = 0
         self.done = False
 
-
-
-        self.task = self.recipe_book.sample_task()
+        self.task = self.recipe_book.sample_task(seed)
 
         self._reset_selection()
         self._reset_table()
@@ -121,8 +118,7 @@ class LittleAlchemy2Text(WordCraftEnv):
             inventory = [self.encode(el) for el in inventory]
         return inventory
 
-    def _string_to_actions(self, actions):
-
+    def parse_input(self, actions):
         start_first = find_nth(actions, "Combination: '", 1)
         actions = actions[start_first:]
         start_first = find_nth(actions, "Combination: '", 1)
@@ -130,11 +126,15 @@ class LittleAlchemy2Text(WordCraftEnv):
         first_word = actions[start_first + len("Combination: '"):end_first]
         end_second = find_nth(actions, "'", 4)
         second_word = actions[(end_first + 7): end_second]
+        return first_word, second_word
+
+    def _string_to_actions(self, actions):
+
+        first_word, second_word = self.parse_input(actions)
 
         if self.encoded:
             first_word = self.decode(first_word)
             second_word = self.decode(second_word)
-
 
         if first_word in self.table and second_word in self.table:
             action = [int(self.table.index(first_word)), int(self.table.index(second_word))]
@@ -279,6 +279,7 @@ class LittleAlchemy2Text(WordCraftEnv):
                 past_invalid_combs_str.append(
                     '"' + str(env.index_to_word(el[0])) + '" and "' + str(env.index_to_word(el[1])) + '"')
             total_past_invalid_combs += ", ".join(past_invalid_combs_str)
+            total_past_invalid_combs += ", "
 
         social_info += total_valid_combs + "\nOther players invalid combinations (do not repeat combinations here): " + total_past_invalid_combs
 

@@ -15,21 +15,19 @@ SUBGOAL_REWARD = 1.0
 class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
     def __init__(self,
-                 seed,
-                 data_path,
                  encoded=False,
                  max_mix_steps=1):
 
-        super().__init__(seed=seed, data_path=data_path, max_mix_steps=max_mix_steps, encoded=encoded)
+        super().__init__(max_mix_steps=max_mix_steps, encoded=encoded)
 
         self.num_distractors = 0
-        self.max_depth = 1
+        self.max_depth = 10
 
         self.recipe_book = RecipeBook(
             data_path=self.data_path,
             seed=self.seed)
 
-        self._setup(self.recipe_book)
+        self._setup()
 
         num_entities = len(self.recipe_book.entities)
 

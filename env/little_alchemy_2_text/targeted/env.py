@@ -17,7 +17,6 @@ from env.little_alchemy_2_text.base import LittleAlchemy2Text
 class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
 
     def __init__(self,
-                 seed,
                  encoded=False,
                  max_mix_steps=1,
                  max_depth=1,
@@ -26,16 +25,16 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
                  num_distractors=0,
                  ):
 
-        super().__init__(seed=seed, max_mix_steps=max_mix_steps, encoded=encoded)
+        super().__init__(max_mix_steps=max_mix_steps, encoded=encoded)
         self.Recipe = Recipe
 
         self.num_distractors = num_distractors
         self.max_depth = max_depth
 
         self.recipe_book = RecipeBook(
-            data_path=self.data_path, max_depth=max_depth, split=split, train_ratio=train_ratio, seed=seed)
+            data_path=self.data_path, max_depth=max_depth, split=split, train_ratio=train_ratio, seed=self.seed)
 
-        self._setup(self.recipe_book)
+        self._setup()
 
         num_entities = len(self.recipe_book.entities)
 
@@ -51,8 +50,9 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
 
 
 
-    def reset(self):
-        super().reset()
+    def reset(self, seed):
+        self.seed = seed
+        super().reset(seed=seed)
         self.distractors = self.recipe_book.sample_distractors(self.task, self.num_distractors,
                                                                uniform=self.uniform_distractors)
 
