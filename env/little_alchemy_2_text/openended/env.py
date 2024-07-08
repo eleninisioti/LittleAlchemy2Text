@@ -16,9 +16,10 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
     def __init__(self,
                  encoded=False,
-                 max_mix_steps=1):
+                 max_mix_steps=1,
+                 **kwargs):
 
-        super().__init__(max_mix_steps=max_mix_steps, encoded=encoded)
+        super().__init__(max_mix_steps=max_mix_steps, encoded=encoded, **kwargs)
 
         self.num_distractors = 0
         self.max_depth = 10

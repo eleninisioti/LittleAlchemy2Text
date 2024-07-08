@@ -21,6 +21,7 @@ def find_nth(haystack, needle, n):
 class LittleAlchemy2Text(WordCraftEnv):
 
     def __init__(self,
+                 data_path="LittleAlchemy2Text/env/wordcraft/datasets/alchemy2.json",
                  encoded=False,
                  max_mix_steps=1):
 
@@ -32,7 +33,7 @@ class LittleAlchemy2Text(WordCraftEnv):
 
         self.env_dir = "LittleAlchemy2Text/env/little_alchemy_2_text"
 
-        self.data_path = "LittleAlchemy2Text/env/wordcraft/datasets/alchemy2.json"
+        self.data_path = data_path
 
         self.max_mix_steps = max_mix_steps
         self.encoded = encoded

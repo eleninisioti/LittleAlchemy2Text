@@ -23,9 +23,10 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
                  split='by_recipe',
                  train_ratio=1.0,
                  num_distractors=0,
+                 **kwargs
                  ):
 
-        super().__init__(max_mix_steps=max_mix_steps, encoded=encoded)
+        super().__init__(max_mix_steps=max_mix_steps, encoded=encoded, **kwargs)
         self.Recipe = Recipe
 
         self.num_distractors = num_distractors

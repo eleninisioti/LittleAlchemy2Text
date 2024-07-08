@@ -41,18 +41,19 @@ def setup(args):
         if args.targeted:
             task_descript = "Combine the available items to make the target item"
             env = gym.make("LittleAlchemy2TextTargeted-v0",
-                           seed=args.seed,
                            max_mix_steps=args.rounds,
+                           data_path="env/wordcraft/datasets/alchemy2.json",
                            num_distractors=args.distractors,
                            max_depth=args.depth,
                            encoded=args.encoded)
         else:
             task_descript = "Combine the available items to make as many items as possible."
             env = gym.make("LittleAlchemy2TextOpen-v0",
-                           seed=args.seed,
+                           data_path="env/wordcraft/datasets/alchemy2.json",
+
                            max_mix_steps=args.rounds,
                            encoded=args.encoded)
-        group.append(Human(i, env, task_descript))
+        group.append(Human(i, env, task_descript, seed=args.seed))
 
     for i in range(nhuman, nhuman + nLLM):
         if args.targeted:
@@ -68,7 +69,7 @@ def setup(args):
                            max_mix_steps=args.rounds,
                            encoded=args.encoded)
 
-        group.append(LLM(i, env, targeted=args.targeted, multiagent=(nLLM - 1)))
+        group.append(LLM(i, env, targeted=args.targeted, multiagent=(nLLM - 1), seed=args.seed))
 
     return group
 
