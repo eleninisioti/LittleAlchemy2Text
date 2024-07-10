@@ -18,13 +18,13 @@ class LLM:
 
     def setup(self, targeted, multiagent):
         if targeted and multiagent:
-            prompt_file = "prompts/targeted_multi.txt"
+            prompt_file = self.env.env_dir + "/prompts/targeted_multi.txt"
         elif targeted and not multiagent:
-            prompt_file = "prompts/openended_multi.txt"
+            prompt_file = self.env.env_dir + "/prompts/openended_multi.txt"
         elif not targeted and multiagent:
-            prompt_file = "prompts/openeded_multi.txt"
+            prompt_file = self.env.env_dir + "/prompts/openeded_multi.txt"
         else:
-            prompt_file = "prompts/openended_single.txt"
+            prompt_file = self.env.env_dir + "/prompts/openended_single.txt"
 
         temp = open(prompt_file, 'r').readlines()
         self.intro = " ".join(temp)

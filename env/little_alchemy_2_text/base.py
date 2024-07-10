@@ -21,9 +21,10 @@ def find_nth(haystack, needle, n):
 class LittleAlchemy2Text(WordCraftEnv):
 
     def __init__(self,
-                 data_path="LittleAlchemy2Text/env/wordcraft/datasets/alchemy2.json",
                  encoded=False,
                  max_mix_steps=1):
+
+        self.env_dir = os.path.dirname(os.path.abspath(__file__))
 
         self.feature_type = 'glove'
         self.shuffle_features = False
@@ -31,9 +32,7 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.uniform_distractors = False
         self.eval_mode = False
 
-        self.env_dir = "LittleAlchemy2Text/env/little_alchemy_2_text"
-
-        self.data_path = data_path
+        self.data_path = self.env_dir + "/../wordcraft/datasets/alchemy2.json"
 
         self.max_mix_steps = max_mix_steps
         self.encoded = encoded
@@ -242,13 +241,18 @@ class LittleAlchemy2Text(WordCraftEnv):
         items = list(self.recipe_book.entities)
         return items.index(word)
 
-    def render(self, envs, mode='human'):
+    def render(self, envs, player_type=None):
 
         info = self._display_llm()
 
         if len(envs):
             social_info = self._display_social(envs)
             info = info + "\n" + social_info
+
+        if player_type == "human":
+            info = info.replace("(do not repeat combinations here)", "")
+            info = info.replace("INPUT", "")
+
         return info
 
     def _display_social(self, envs):

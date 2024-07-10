@@ -76,7 +76,7 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
         valid_combs, past_invalid_combs = self._print_valid_and_invalid_combs()
 
-        output = "\n<human> INPUT \n Inventory: '" + "', '".join(inventory) + "'"
+        output = "\n<human> INPUT \nInventory: '" + "', '".join(inventory)
         output += "\nTask valid combinations (do not repeat combinations here): " + valid_combs
         output += "\nTask invalid combinations (do not repeat combinations here): " + past_invalid_combs
         return output
