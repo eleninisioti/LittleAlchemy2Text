@@ -259,11 +259,11 @@ class LittleAlchemy2Text(WordCraftEnv):
         social_info = "Other players valid combinations: "
         total_valid_combs = ""
         total_past_invalid_combs = ""
+        counter = 0
 
         for env in envs:
             valid_combs = ""
 
-            counter = 0
             for key, val in env.past_valid_combs.items():
                 subkeys = []
                 for subkey in key:
