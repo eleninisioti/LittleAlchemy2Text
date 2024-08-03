@@ -109,7 +109,8 @@ class RecipeBook:
             self.neighbors_combineswith[e2].add(e1)
 
     def sample_task(self, seed):
-        base_root_entities = ['earth', 'air', 'fire', 'water']
+        #base_root_entities = ['earth', 'air', 'fire', 'water']
+        base_root_entities = 'water', 'fire', 'wood', 'plant', 'stone', 'dust', 'air', 'metal'
         #random_root_entities = random.sample(self.entities, 8)
         root_entities = base_root_entities
         task = Task(base_entities=root_entities)

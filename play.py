@@ -37,6 +37,11 @@ def setup(args):
         except ValueError:
             print("Wrong input, pick an integer.")
 
+    if nLLM:
+        import subprocess
+        print("Pulling ollama agent")
+        subprocess.run(['ollama', 'pull', 'llama3'], capture_output=True, text=True)
+
     group = []
     for i in range(nhuman):
         if args.targeted:
