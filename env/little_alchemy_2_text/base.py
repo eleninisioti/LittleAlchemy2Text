@@ -21,30 +21,30 @@ def find_nth(haystack, needle, n):
 class LittleAlchemy2Text(WordCraftEnv):
 
     def __init__(self,
-                 seed=0,
                  encoded=False,
                  max_mix_steps=1):
+
+        self.env_dir = os.path.dirname(os.path.abspath(__file__))
 
         self.feature_type = 'glove'
         self.shuffle_features = False
         self.random_feature_size = 300
         self.uniform_distractors = False
         self.eval_mode = False
-        self.data_path = "env/wordcraft/datasets/alchemy2.json" # database that contains the items
+
+        self.data_path = self.env_dir + "/../wordcraft/datasets/alchemy2.json"
 
         self.max_mix_steps = max_mix_steps
         self.encoded = encoded
-        self.seed = seed
+        seed = int.from_bytes(os.urandom(4), byteorder="little")
+        self.set_seed(seed)
+        utils_seed(seed)
 
         self.decode_dict = {}
 
-        if seed is None:
-            seed = int.from_bytes(os.urandom(4), byteorder="little")
-        self.set_seed(seed)
-        utils_seed(seed)
         self.success = False
 
-    def _setup(self, recipe_book):
+    def _setup(self):
 
         self.feature_map = FeatureMap(
             words=self.recipe_book.entities,
@@ -62,6 +62,8 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.distractors = tuple([])
         self.goal_features = np.zeros(self.feature_map.feature_dim)
 
+
+
         self._reset_table()
         self._reset_selection()
         self._reset_history()
@@ -74,7 +76,9 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.action_space = gym.spaces.Discrete(
             self.max_table_size)  # Actions correspond to choosing an entity in a table position
 
-    def reset(self):
+    def reset(self, seed):
+
+        self.seed = seed
         self.past_invalid_combs = []
         self.past_valid_combs = {}
 
@@ -83,7 +87,7 @@ class LittleAlchemy2Text(WordCraftEnv):
         self.episode_reward = 0
         self.done = False
 
-        self.task = self.recipe_book.sample_task()
+        self.task = self.recipe_book.sample_task(seed)
 
         self._reset_selection()
         self._reset_table()
@@ -108,8 +112,13 @@ class LittleAlchemy2Text(WordCraftEnv):
         else:
             return None
 
-    def _string_to_actions(self, actions):
+    def get_inventory(self):
+        inventory = self.table
+        if self.encoded:
+            inventory = [self.encode(el) for el in inventory]
+        return inventory
 
+    def parse_input(self, actions):
         start_first = find_nth(actions, "Combination: '", 1)
         actions = actions[start_first:]
         start_first = find_nth(actions, "Combination: '", 1)
@@ -117,11 +126,15 @@ class LittleAlchemy2Text(WordCraftEnv):
         first_word = actions[start_first + len("Combination: '"):end_first]
         end_second = find_nth(actions, "'", 4)
         second_word = actions[(end_first + 7): end_second]
+        return first_word, second_word
+
+    def _string_to_actions(self, actions):
+
+        first_word, second_word = self.parse_input(actions)
 
         if self.encoded:
             first_word = self.decode(first_word)
             second_word = self.decode(second_word)
-
 
         if first_word in self.table and second_word in self.table:
             action = [int(self.table.index(first_word)), int(self.table.index(second_word))]
@@ -228,24 +241,29 @@ class LittleAlchemy2Text(WordCraftEnv):
         items = list(self.recipe_book.entities)
         return items.index(word)
 
-    def render(self, envs, mode='human'):
+    def render(self, envs, player_type=None):
 
         info = self._display_llm()
 
         if len(envs):
             social_info = self._display_social(envs)
             info = info + "\n" + social_info
+
+        if player_type == "human":
+            info = info.replace("(do not repeat combinations here)", "")
+            info = info.replace("INPUT", "")
+
         return info
 
     def _display_social(self, envs):
         social_info = "Other players valid combinations: "
         total_valid_combs = ""
         total_past_invalid_combs = ""
+        counter = 0
 
         for env in envs:
             valid_combs = ""
 
-            counter = 0
             for key, val in env.past_valid_combs.items():
                 subkeys = []
                 for subkey in key:
@@ -266,6 +284,7 @@ class LittleAlchemy2Text(WordCraftEnv):
                 past_invalid_combs_str.append(
                     '"' + str(env.index_to_word(el[0])) + '" and "' + str(env.index_to_word(el[1])) + '"')
             total_past_invalid_combs += ", ".join(past_invalid_combs_str)
+            total_past_invalid_combs += ", "
 
         social_info += total_valid_combs + "\nOther players invalid combinations (do not repeat combinations here): " + total_past_invalid_combs
 
@@ -339,6 +358,10 @@ class LittleAlchemy2Text(WordCraftEnv):
                 past_invalid_combs_str.append(
                     '"' + str(self.index_to_word(element[0])) + '" and "' + str(self.index_to_word(element[1])) + '"')
 
+        if len(past_invalid_combs):
+            past_invalid_combs = ", ".join(past_invalid_combs_str)
+        else:
+            past_invalid_combs = ""
         return valid_combs, past_invalid_combs
     def get_valid_combs(self):
         """Returns invalid combinations as a string"""

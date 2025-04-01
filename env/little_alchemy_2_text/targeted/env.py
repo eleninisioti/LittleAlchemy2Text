@@ -17,24 +17,25 @@ from env.little_alchemy_2_text.base import LittleAlchemy2Text
 class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
 
     def __init__(self,
-                 seed,
                  encoded=False,
                  max_mix_steps=1,
                  max_depth=1,
                  split='by_recipe',
                  train_ratio=1.0,
                  num_distractors=0,
+                 **kwargs
                  ):
 
-        super().__init__(seed=seed, max_mix_steps=max_mix_steps, encoded=encoded)
+        super().__init__(max_mix_steps=max_mix_steps, encoded=encoded, **kwargs)
+        self.Recipe = Recipe
 
         self.num_distractors = num_distractors
         self.max_depth = max_depth
 
         self.recipe_book = RecipeBook(
-            data_path=self.data_path, max_depth=max_depth, split=split, train_ratio=train_ratio, seed=seed)
+            data_path=self.data_path, max_depth=max_depth, split=split, train_ratio=train_ratio, seed=self.seed)
 
-        self._setup(self.recipe_book)
+        self._setup()
 
         num_entities = len(self.recipe_book.entities)
 
@@ -50,8 +51,9 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
 
 
 
-    def reset(self):
-        super().reset()
+    def reset(self, seed):
+        self.seed = seed
+        super().reset(seed=seed)
         self.distractors = self.recipe_book.sample_distractors(self.task, self.num_distractors,
                                                                uniform=self.uniform_distractors)
 
@@ -77,7 +79,7 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
         else:
             recipe = Recipe(selection)
 
-            result, obs, reward, self.done, info = super()._step(recipe, new_comb, actions)
+            result, obs, reward, _, info = super()._step(recipe, new_comb, actions)
             info["repeat"] = False
 
             if result == self.task.goal:
@@ -107,7 +109,7 @@ class LittleAlchemy2TextTargeted(LittleAlchemy2Text):
         output += "\nRemaining rounds: " + str(remaining_rounds)
         output += "\nNumber of intermediate items: " + str(len(self.task.intermediate_entities))
         output += "\nTask valid combinations (do not repeat combinations here): " + valid_combs
-        output += "\nTask invalid combinations (do not repeat combinations here): " + ", ".join(past_invalid_combs)
+        output += "\nTask invalid combinations (do not repeat combinations here): " + past_invalid_combs
         return output
 
 

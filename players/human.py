@@ -4,7 +4,7 @@
 
 class Human():
 
-    def __init__(self, idx, env, task_descript):
+    def __init__(self, idx, env, task_descript, seed):
         self.idx = idx # id in the group
         self.type = "human"
 
@@ -12,7 +12,7 @@ class Human():
         self.done = False
         self.description = task_descript
 
-        self.env.reset()
+        self.env.reset(seed=seed)
 
     def move(self, state):
         item1 = input('Player ' + str(self.idx) + ', you may choose the first item: ')

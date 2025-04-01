@@ -16,6 +16,7 @@ import gym
 from players.human import Human
 from players.LLM import LLM
 
+ENV_DIR = os.getcwd()
 
 def setup(args):
 
@@ -36,12 +37,16 @@ def setup(args):
         except ValueError:
             print("Wrong input, pick an integer.")
 
+    if nLLM:
+        import subprocess
+        print("Pulling ollama agent")
+        subprocess.run(['ollama', 'pull', 'llama3'], capture_output=True, text=True)
+
     group = []
     for i in range(nhuman):
         if args.targeted:
             task_descript = "Combine the available items to make the target item"
             env = gym.make("LittleAlchemy2TextTargeted-v0",
-                           seed=args.seed,
                            max_mix_steps=args.rounds,
                            num_distractors=args.distractors,
                            max_depth=args.depth,
@@ -49,26 +54,23 @@ def setup(args):
         else:
             task_descript = "Combine the available items to make as many items as possible."
             env = gym.make("LittleAlchemy2TextOpen-v0",
-                           seed=args.seed,
                            max_mix_steps=args.rounds,
                            encoded=args.encoded)
-        group.append(Human(i, env, task_descript))
+        group.append(Human(i, env, task_descript, seed=args.seed))
 
     for i in range(nhuman, nhuman + nLLM):
         if args.targeted:
             env = gym.make("LittleAlchemy2TextTargeted-v0",
-                           seed=args.seed,
                            max_mix_steps=args.rounds,
                            num_distractors=args.distractors,
                            max_depth=args.depth,
                            encoded=args.encoded)
         else:
             env = gym.make("LittleAlchemy2TextOpen-v0",
-                           seed=args.seed,
                            max_mix_steps=args.rounds,
                            encoded=args.encoded)
 
-        group.append(LLM(i, env, targeted=args.targeted, multiagent=(nLLM - 1)))
+        group.append(LLM(i, env, targeted=args.targeted, multiagent=(nLLM - 1), seed=args.seed))
 
     return group
 
@@ -94,7 +96,7 @@ def game(args):
 
                     other_envs = [other_player.env for other_player in group if other_player.idx != player.idx]
 
-                    state = player.env.render(other_envs)
+                    state = player.env.render(other_envs, player.type)
                     print(state)
 
                     repeat = True

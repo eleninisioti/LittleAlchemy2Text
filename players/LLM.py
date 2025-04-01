@@ -6,7 +6,7 @@ import ollama
 
 class LLM:
 
-    def __init__(self, idx, env, targeted, multiagent):
+    def __init__(self, idx, env, targeted, multiagent, seed):
         self.idx = idx  # id the group
         self.env = env
         self.done = False
@@ -14,7 +14,7 @@ class LLM:
         self.setup(targeted, multiagent)
 
         self.type = "LLM"
-        self.env.reset()
+        self.env.reset(seed=seed)
 
     def setup(self, targeted, multiagent):
         if targeted and multiagent:
@@ -25,6 +25,7 @@ class LLM:
             prompt_file = "env/little_alchemy_2_text/prompts/openeded_multi.txt"
         else:
             prompt_file = "env/little_alchemy_2_text/prompts/openended_single.txt"
+
 
         temp = open(prompt_file, 'r').readlines()
         self.intro = " ".join(temp)

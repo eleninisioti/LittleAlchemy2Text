@@ -1,0 +1,142 @@
+body {
+            font-family: Arial, sans-serif;
+            background-color: #6a1b9a; /* Little Alchemy 2 purple shade */
+            color: #fff; /* White text color */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align items at the top */
+            height: 100vh;
+            margin: 0;
+            padding-top: 20px; /* Add some padding at the top */
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 20px;
+            width: 100%;
+        }
+        .chat-container {
+            flex: 1.5; /* Adjust the size relative to the other section */
+            margin-right: 20px; /* Adjust distance from the right fields */
+            padding: 10px; /* Adjust padding inside the container */
+            border: 1px solid #ddd; /* Border around form container */
+            border-radius: 5px; /* Rounded corners for form container */
+            max-width: 500px; /* Set a maximum width */
+            background-color: #fff; /* White background for form container */
+            color: #000; /* Black text color for form container */
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            height: 300px; /* Set a fixed height for the chat box */
+            word-wrap: break-word; /* Ensure long words break and wrap correctly */
+        }
+        .chat-box p {
+            margin: 0;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+            white-space: pre-wrap; /* Preserve spaces and line breaks */
+        }
+        .chat-input-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px; /* Add spacing between the two input fields */
+        }
+        .play-button {
+            background-color: #fff; /* White background for play button */
+            color: #6a1b9a; /* Purple text color for play button */
+            border: 2px solid #6a1b9a; /* Purple border for play button */
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 25px; /* More rounded corners for play button */
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .play-button:hover {
+            background-color: #f3e5f5; /* Light purple background on hover */
+        }
+        .additional-fields {
+            flex: 1;
+            max-width: 400px; /* Increase the width of the additional fields */
+            margin-left: 20px; /* Distance from the left form */
+            background-color: #fff; /* White background for additional fields */
+            color: #000; /* Black text color for additional fields */
+            border: 1px solid #ddd; /* Border around additional fields */
+            border-radius: 5px; /* Rounded corners for additional fields */
+            padding: 10px; /* Padding inside additional fields */
+        }
+        .additional-fields p,
+        .additional-fields span {
+            margin: 5px 0;
+            padding: 15px; /* Increase padding for better spacing */
+            border: 1px solid #ddd; /* Optional: add border for visual separation */
+            background-color: #f9f9f9; /* Optional: add background color */
+            border-radius: 4px; /* Optional: rounded corners */
+            width: 100%; /* Ensure they take full width of their container */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        .additional-fields p {
+            background-color: transparent; /* Remove background for plain text appearance */
+            border: none; /* Remove border for plain text appearance */
+            padding: 0; /* Remove padding for plain text appearance */
+        }
+        .additional-fields span {
+            display: block; /* Ensure span behaves like a block element */
+        }
+        h2 {
+            margin-top: 0; /* Remove top margin for headers */
+            margin-bottom: 15px; /* Add spacing below headers */
+            font-size: 1.5em; /* Adjust font size as needed */
+        }
+        .start-button {
+            background-color: #fff; /* White background for start button */
+            color: #6a1b9a; /* Purple text color for start button */
+            border: 2px solid #6a1b9a; /* Purple border for start button */
+            padding: 15px 30px;
+            font-size: 1.5em;
+            border-radius: 25px; /* More rounded corners for start button */
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .start-button span {
+            display: block; /* Ensure each line behaves like a block element */
+            text-align: center;
+        }
+        .start-button:hover {
+            background-color: #f3e5f5; /* Light purple background on hover */
+        }
+        .start-container {
+            text-align: center;
+            width: 100%; /* Full width for centering */
+        }
+        .new-game-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #fff;
+            color: #6a1b9a;
+            border: 2px solid #6a1b9a;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .new-game-button:hover {
+            background-color: #f3e5f5;
+        }

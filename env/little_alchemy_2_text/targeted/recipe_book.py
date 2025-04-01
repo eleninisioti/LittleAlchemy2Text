@@ -127,10 +127,13 @@ class RecipeBook:
             self.neighbors_combineswith[e1].add(e2)
             self.neighbors_combineswith[e2].add(e1)
 
-    def sample_task(self, depth=None):
+    def sample_task(self, seed, depth=None):
         """
         Returns a task tuple (<goal>, <intermediate entities>, <base entities>)
         """
+        self.set_seed(seed)
+
+
         if depth is None:
             depth = self.np_random.choice(range(1,self.max_depth+1))
 

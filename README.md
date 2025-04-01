@@ -26,13 +26,8 @@ To install all necessary package dependencies you can run:
 
 ### Playing with humans and LLMs
 
-
 To enable the use of LLMs we are using the [ollama](https://github.com/ollama/ollama-python) library.
 This is an API to various opensource LLMs, such as LLama 3, Phi 3 Mistral and Gemma 2.
-
-In order to be able to use a model you need to first pull it, e.g.
-
-    ollama pull llama3
 
 We have provided a script for illustrating how humans and LLMs can play a game. Upon running:
 

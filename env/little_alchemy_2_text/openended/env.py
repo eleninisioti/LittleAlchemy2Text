@@ -15,20 +15,20 @@ SUBGOAL_REWARD = 1.0
 class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
     def __init__(self,
-                 seed,
                  encoded=False,
-                 max_mix_steps=1):
+                 max_mix_steps=1,
+                 **kwargs):
 
-        super().__init__(seed=seed, max_mix_steps=max_mix_steps, encoded=encoded)
+        super().__init__(max_mix_steps=max_mix_steps, encoded=encoded, **kwargs)
 
         self.num_distractors = 0
-        self.max_depth = 1
+        self.max_depth = 10
 
         self.recipe_book = RecipeBook(
             data_path=self.data_path,
             seed=self.seed)
 
-        self._setup(self.recipe_book)
+        self._setup()
 
         num_entities = len(self.recipe_book.entities)
 
@@ -40,9 +40,11 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
         }
         self.observation_space = gym.spaces.Dict(dspaces)
 
-    def reset(self):
+    def reset(self, seed):
         self.distractors = []
-        return super().reset()
+        super().reset(seed)
+
+        return self._get_observation()
 
     def _get_observation(self):
         return super()._get_observation()
@@ -74,9 +76,9 @@ class LittleAlchemy2TextOpen(LittleAlchemy2Text):
 
         valid_combs, past_invalid_combs = self._print_valid_and_invalid_combs()
 
-        output = "\n<human> INPUT \n Inventory: '" + "', '".join(inventory) + "'"
+        output = "\n<human> INPUT \nInventory: '" + "', '".join(inventory)
         output += "\nTask valid combinations (do not repeat combinations here): " + valid_combs
-        output += "\nTask invalid combinations (do not repeat combinations here): " + ", ".join(past_invalid_combs)
+        output += "\nTask invalid combinations (do not repeat combinations here): " + past_invalid_combs
         return output
 
 
