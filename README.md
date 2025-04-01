@@ -10,7 +10,7 @@ How did we extend Wordcraft?
 
 * added open-ended tasks. These start with the same items that Little Alchemy 2 starts with and have no target item
 * added support for multiple agents. The agents are not in the same environment but receive information about the actions of others
-* added ability to encode words into random strings
+* added ability to encode words into random stringsollama
 * engineered prompts for instructing LLMs to play the task
 * some bug fixes (eg ensuring that tasks are set deterministically by the seed, dealing with items missing from the data base)
 
